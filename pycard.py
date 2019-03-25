@@ -106,38 +106,38 @@ def parse_options():
         version="%prog {}".format(VERSION)
     )
     parser.add_option("-p", "--path",
-                      help="path to assets",
+                      help="path to assets [default: %default]",
                       dest="path",
                       default=os.getcwd(),
                       metavar="PATH")
 
     parser.add_option("-x", "--prefix",
-                      help="filename prefix, example _card<.ext>",
+                      help="filename prefix [default: %default]",
                       dest="prefix",
                       default="_card",
                       metavar="PREFIX")
 
     parser.add_option("-d", "--delimiter",
-                      help="delimiter used in the csv file, default: , (comma)",
+                      help="delimiter used in the csv file [default: %default]",
                       dest="delimiter",
                       default=",",
                       metavar="DELIMITER")
 
     parser.add_option("--port",
-                      help="port to use for live reloaded page",
+                      help="port to use for live reloaded page [default: %default]",
                       dest="port",
                       type="int",
                       default=8800,
                       metavar="PORT")
 
     parser.add_option("--address",
-                      help="host address to bind to",
+                      help="host address to bind to [default: %default]",
                       dest="host_address",
                       default="0.0.0.0",
                       metavar="ADDRESS")
 
     parser.add_option("--render",
-                     help="rendered file",
+                     help="rendered file [default: %default]",
                      dest="rendered_cards_file",
                      default=DEFAULT_RENDERED_CARDS_FILE,
                      metavar="RENDERED_CARDS_FILE")
