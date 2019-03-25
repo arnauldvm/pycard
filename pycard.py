@@ -13,11 +13,11 @@ from livereload import Server
 
 VERSION = '0.1.0'
 
-RENDERED_CARDS_FILE = "index.html"
+DEFAULT_RENDERED_CARDS_FILE = "index.html"
 
 
 class CardRenderer:
-    def __init__(self, input_path, prefix):
+    def __init__(self, input_path, prefix, rendered_cards_file):
         self.prefix = prefix
         self.input_path = input_path
 
@@ -27,7 +27,7 @@ class CardRenderer:
 
         self.cards_template_path = os.path.join(os.path.dirname(__file__), 'cards.html.jinja2')
 
-        self.all_cards_rendered_path = os.path.join(input_path, RENDERED_CARDS_FILE)
+        self.all_cards_rendered_path = os.path.join(input_path, rendered_cards_file)
 
     def get_path(self, extension):
         return os.path.join(self.input_path, "{}.{}".format(self.prefix, extension))
@@ -136,6 +136,12 @@ def parse_options():
                       default="0.0.0.0",
                       metavar="ADDRESS")
 
+    parser.add_option("--render",
+                     help="rendered file",
+                     dest="rendered_cards_file",
+                     default=DEFAULT_RENDERED_CARDS_FILE,
+                     metavar="RENDERED_CARDS_FILE")
+
     return parser.parse_args()
 
 
@@ -150,10 +156,11 @@ def main():
     assets_path = options.path
     file_prefix = options.prefix
     host_address = options.host_address
+    rendered_cards_file = options.rendered_cards_file
 
     csv.register_dialect('custom_delimiter', delimiter=options.delimiter)
 
-    card_renderer = CardRenderer(assets_path, file_prefix)
+    card_renderer = CardRenderer(assets_path, file_prefix, rendered_cards_file)
 
     observer = Observer()
     observer.schedule(LoggingEventHandler(), assets_path, recursive=True)
