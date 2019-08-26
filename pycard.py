@@ -162,7 +162,7 @@ def main():
     file_prefix = options.prefix
     host_address = options.host_address
     rendered_cards_file = options.rendered_cards_file
-    csv_file = options.csv_file  # if 'csv_file' in options else None
+    csv_file = options.csv_file
 
     csv.register_dialect('custom_delimiter', delimiter=options.delimiter)
 
