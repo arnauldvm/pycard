@@ -17,11 +17,11 @@ DEFAULT_RENDERED_CARDS_FILE = "index.html"
 
 
 class CardRenderer:
-    def __init__(self, input_path, prefix, rendered_cards_file):
+    def __init__(self, input_path, prefix, rendered_cards_file, csv_file=None):
         self.prefix = prefix
         self.input_path = input_path
 
-        self.csv_card_path = self.get_path("csv")
+        self.csv_card_path = csv_file if csv_file else self.get_path("csv")
         self.custom_header_path = self.get_path("header.html")
         self.single_card_template_path = self.get_path("html.jinja2")
 
@@ -142,6 +142,11 @@ def parse_options():
                      default=DEFAULT_RENDERED_CARDS_FILE,
                      metavar="RENDERED_CARDS_FILE")
 
+    parser.add_option("--csv",
+                     help="csv file [default: prefix + '.csv']",
+                     dest="csv_file",
+                     metavar="CSV_FILE")
+
     return parser.parse_args()
 
 
@@ -157,10 +162,11 @@ def main():
     file_prefix = options.prefix
     host_address = options.host_address
     rendered_cards_file = options.rendered_cards_file
+    csv_file = options.csv_file  # if 'csv_file' in options else None
 
     csv.register_dialect('custom_delimiter', delimiter=options.delimiter)
 
-    card_renderer = CardRenderer(assets_path, file_prefix, rendered_cards_file)
+    card_renderer = CardRenderer(assets_path, file_prefix, rendered_cards_file, csv_file)
 
     observer = Observer()
     observer.schedule(LoggingEventHandler(), assets_path, recursive=True)
