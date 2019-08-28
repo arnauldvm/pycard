@@ -95,6 +95,16 @@ The page found at localhost:8800 is now printable!
 
 ![image](https://user-images.githubusercontent.com/903488/31474239-521061be-aeae-11e7-81ac-626490faacee.png)
 
+### Pattern based selection
+
+It is possible to select several input templates by using a pattern.
+
+Example:
+
+```bash
+python pycard.py -p 'some_dir' -x '{}' --render '{}.html' --csv '{}.csv' --css styles.css --pattern '(prefix1|prefix2)'
+```
+
 ### Credits
 
 Inspired by https://github.com/vaemendis/hccd
