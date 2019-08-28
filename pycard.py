@@ -91,14 +91,15 @@ class CardRenderer:
 
 
 class RenderingEventHandler(FileSystemEventHandler):
-    def __init__(self, card_renderer):
-        self.card_renderer = card_renderer
+    def __init__(self, card_renderers):
+        self.card_renderers = card_renderers
 
     def on_any_event(self, event):
-        if event.src_path == self.card_renderer.all_cards_rendered_path:
+        if event.src_path in [ card_renderer.all_cards_rendered_path for card_renderer in self.card_renderers ]:
             return
 
-        self.card_renderer.render_cards()
+        for card_renderer in self.card_renderers:
+            card_renderer.render_cards()
 
 
 def parse_options():
@@ -153,8 +154,24 @@ def parse_options():
                      dest="css_file",
                      metavar="CSS_FILE")
 
+    parser.add_option("--pattern",
+                     help="activates pattern matching [default: %default]",
+                     dest="pattern",
+                     default=None,
+                     metavar="PATTERN")
+
     return parser.parse_args()
 
+
+def re_glob(dir, pattern):
+    regex = re.compile(pattern)
+    files = {
+        matched.group(1): file
+        for file in os.listdir(dir)
+        for matched in [ regex.match(file) ]
+        if matched
+    }
+    return files
 
 def main():
     logging.basicConfig(level=logging.INFO,
@@ -170,21 +187,36 @@ def main():
     rendered_cards_file = options.rendered_cards_file
     csv_file = options.csv_file
     css_file = options.css_file
+    pattern = options.pattern
 
     csv.register_dialect('custom_delimiter', delimiter=options.delimiter)
 
-    card_renderer = CardRenderer(assets_path, file_prefix, rendered_cards_file, csv_file, css_file)
+    if pattern is None:
+        card_renderers = [ CardRenderer(assets_path, file_prefix, rendered_cards_file, csv_file, css_file) ]
+    else:
+        matches = re_glob(assets_path, pattern + re.escape(".html.jinja2"))
+        card_renderers = [
+            CardRenderer(assets_path,
+                file_prefix.format(match),
+                rendered_cards_file.format(match),
+                csv_file.format(match),
+                css_file.format(match)
+            )
+            for match in matches.keys()
+        ]
 
     observer = Observer()
     observer.schedule(LoggingEventHandler(), assets_path, recursive=True)
-    observer.schedule(RenderingEventHandler(card_renderer), assets_path, recursive=True)
+    observer.schedule(RenderingEventHandler(card_renderers), assets_path, recursive=True)
 
-    card_renderer.render_cards()
+    for card_renderer in card_renderers:
+        card_renderer.render_cards()
 
     observer.start()
 
     server = Server()
-    server.watch(card_renderer.all_cards_rendered_path)
+    for card_renderer in card_renderers:
+        server.watch(card_renderer.all_cards_rendered_path)
     server.serve(root=assets_path, port=port, host=host_address)
 
     observer.stop()
