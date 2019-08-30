@@ -11,7 +11,7 @@ from itertools import zip_longest
 from livereload import Server
 
 
-VERSION = '0.1.0'
+VERSION = '0.1.1a'
 
 DEFAULT_RENDERED_CARDS_FILE = "index.html"
 
