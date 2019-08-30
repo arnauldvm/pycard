@@ -1,6 +1,6 @@
 from jinja2 import Template
 import os
-from optparse import OptionParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import logging
 import csv
 import time
@@ -101,63 +101,50 @@ class RenderingEventHandler(FileSystemEventHandler):
             card_renderer.render_cards()
 
 
-def parse_options():
-    parser = OptionParser(
-        usage="usage: %prog [options]",
-        version="%prog {}".format(VERSION)
+def parse_args():
+    parser = ArgumentParser(
+        formatter_class=ArgumentDefaultsHelpFormatter
     )
-    parser.add_option("-p", "--path",
-                      help="path to assets [default: %default]",
-                      dest="path",
-                      default=os.getcwd(),
-                      metavar="PATH")
+    parser.add_argument('--version', action='version', version="%prog {}".format(VERSION))
+    parser.add_argument("--path", "-p",
+                      help="path to assets",
+                      default=os.getcwd())
 
-    parser.add_option("-x", "--prefix",
-                      help="filename prefix [default: %default]",
-                      dest="prefix",
-                      default="_card",
-                      metavar="PREFIX")
+    parser.add_argument("--prefix", "-x",
+                      help="filename prefix",
+                      default="_card")
 
-    parser.add_option("-d", "--delimiter",
-                      help="delimiter used in the csv file [default: %default]",
-                      dest="delimiter",
-                      default=",",
-                      metavar="DELIMITER")
+    parser.add_argument("--delimiter", "-d",
+                      help="delimiter used in the csv file",
+                      default=",")
 
-    parser.add_option("--port",
-                      help="port to use for live reloaded page [default: %default]",
-                      dest="port",
-                      type="int",
-                      default=8800,
-                      metavar="PORT")
+    parser.add_argument("--port",
+                      help="port to use for live reloaded page",
+                      type=int,
+                      default=8800)
 
-    parser.add_option("--address",
-                      help="host address to bind to [default: %default]",
+    parser.add_argument("--address",
+                      help="host address to bind to",
                       dest="host_address",
                       default="0.0.0.0",
                       metavar="ADDRESS")
 
-    parser.add_option("--render",
-                     help="rendered file [default: %default]",
+    parser.add_argument("--render",
+                     help="rendered file",
                      dest="rendered_cards_file",
-                     default=DEFAULT_RENDERED_CARDS_FILE,
-                     metavar="RENDERED_CARDS_FILE")
+                     default=DEFAULT_RENDERED_CARDS_FILE)
 
-    parser.add_option("--csv",
+    parser.add_argument("--csv",
                      help="csv file [default: prefix + '.csv']",
-                     dest="csv_file",
-                     metavar="CSV_FILE")
+                     dest="csv_file")
 
-    parser.add_option("--css",
+    parser.add_argument("--css",
                      help="css file [default: prefix + '.css']",
-                     dest="css_file",
-                     metavar="CSS_FILE")
+                     dest="css_file")
 
-    parser.add_option("--pattern",
-                     help="activates pattern matching [default: %default]",
-                     dest="pattern",
-                     default=None,
-                     metavar="PATTERN")
+    parser.add_argument("--pattern",
+                     help="activates pattern matching",
+                     default=None)
 
     return parser.parse_args()
 
@@ -177,18 +164,18 @@ def main():
                         format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
 
-    (options, args) = parse_options()
+    args = parse_args()
 
-    port = options.port
-    assets_path = options.path
-    file_prefix = options.prefix
-    host_address = options.host_address
-    rendered_cards_file = options.rendered_cards_file
-    csv_file = options.csv_file
-    css_file = options.css_file
-    pattern = options.pattern
+    port = args.port
+    assets_path = args.path
+    file_prefix = args.prefix
+    host_address = args.host_address
+    rendered_cards_file = args.rendered_cards_file
+    csv_file = args.csv_file
+    css_file = args.css_file
+    pattern = args.pattern
 
-    csv.register_dialect('custom_delimiter', delimiter=options.delimiter)
+    csv.register_dialect('custom_delimiter', delimiter=args.delimiter)
 
     if pattern is None:
         card_renderers = [ CardRenderer(assets_path, file_prefix, rendered_cards_file, csv_file, css_file) ]
