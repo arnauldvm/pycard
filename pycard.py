@@ -7,7 +7,6 @@ import time
 import re
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler, FileSystemEventHandler
-from itertools import zip_longest
 from livereload import Server
 
 
